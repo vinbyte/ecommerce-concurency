@@ -34,3 +34,6 @@ Try to run `go build -o simple-rc -race main.go  && ./simple-rc`. You will see t
 The solution is adding the [Mutual Exclusion](https://yourbasic.org/golang/mutex-explained/). Open file `main.go`, then uncomment line 12, 28, and 36. Then try run `go build -o simple-rc -race main.go  && ./simple-rc` again. The warning is gone and the final stock is zero as we expected. Problem solved.
 
 ![race-condition-fix](./assets/images/race-condition-fix.png)
+
+## Database Row Locking
+

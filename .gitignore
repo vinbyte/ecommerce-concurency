@@ -1,3 +1,6 @@
 ecommerce/simple-race-condition/simple-rc
+ecommerce/database-row-locking/.env
+ecommerce/database-row-locking/logs
+ecommerce/database-row-locking/pgdata
 
 .DS_Store

@@ -1,0 +1,33 @@
+version: '3'
+services:
+  app:
+    container_name: ecommerce-app
+    build: .
+    env_file:
+      - .env
+    ports: 
+      - 5050:5050 
+    restart: on-failure
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:latest
+    container_name: ecommerce-db
+    env_file:
+      - .env
+    # environment:
+    #   - POSTGRES_USER=${DB_USER}  
+    #   - POSTGRES_PASSWORD=${DB_PASSWORD}
+    #   - POSTGRES_DB=${DB_NAME}
+    #   - DATABASE_HOST=${DB_HOST} 
+    ports:
+      - '5433:5432'
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 10s
+      retries: 3
