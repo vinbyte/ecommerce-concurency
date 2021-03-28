@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"database/sql"
 	"time"
 )
 
@@ -11,15 +12,16 @@ type OrderUsecase interface {
 	Checkout(ctx context.Context, param CheckoutParam) (code int, response interface{})
 }
 
-// OrderRepository is repositories for order entity
+// OrderRepository is repositories for order entity. We need to pass *sql.Tx in every method because we can't save *sql.Tx as global
 type OrderRepository interface {
-	CreateCart(ctx context.Context, userID int) (cartID int, err error)
-	InsertCartItems(ctx context.Context, cartID int, productCode string, Qty int) error
-	CheckUserByID(ctx context.Context, userID int) (int, error)
-	GetCartData(ctx context.Context, cartID int, isRowLocking bool) (CartData, error)
-	CreateOrders(ctx context.Context, userID int) (int, error)
-	InsertOrderItems(ctx context.Context, orderID int, productCode string, qty int) error
-	DeleteCart(ctx context.Context, cartID int) error
+	CreateCart(ctx context.Context, dbTx *sql.Tx, userID int) (cartID int, err error)
+	InsertCartItems(ctx context.Context, dbTx *sql.Tx, cartID int, productCode string, Qty int) error
+	CheckUserByID(ctx context.Context, dbTx *sql.Tx, userID int) (int, error)
+	GetCartData(ctx context.Context, dbTx *sql.Tx, cartID int, isRowLocking bool) (CartData, error)
+	CreateOrders(ctx context.Context, dbTx *sql.Tx, userID int) (int, error)
+	InsertOrderItems(ctx context.Context, dbTx *sql.Tx, orderID int, productCode string, qty int) error
+	DeleteCart(ctx context.Context, dbTx *sql.Tx, cartID int) error
+	CleanCartAndOrders(ctx context.Context) error
 }
 
 // AddToCartParam parameter for "/cart/add" endpoint

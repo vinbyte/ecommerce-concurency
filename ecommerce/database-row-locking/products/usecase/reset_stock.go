@@ -17,8 +17,9 @@ func (pu *productUsecase) ResetStock(ctx context.Context) (int, interface{}) {
 	ctx, cancel := context.WithTimeout(ctx, pu.contextTimeout)
 	defer cancel()
 
-	_ = pu.productRepo.UpdateStock(ctx, "P1", 3)
-	_ = pu.productRepo.UpdateStock(ctx, "P2", 2)
+	_ = pu.productRepo.UpdateStock(ctx, nil, "P1", 3)
+	_ = pu.productRepo.UpdateStock(ctx, nil, "P2", 2)
+	_ = pu.orderRepo.CleanCartAndOrders(ctx)
 	code = 200
 	successResponse.Data = new(struct{})
 	response = successResponse

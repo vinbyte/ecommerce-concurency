@@ -30,52 +30,15 @@ func (h *Helpers) InitPostgres() *sql.DB {
 		log.Fatal(err)
 		os.Exit(1)
 	}
-	conn.SetMaxOpenConns(25)
-	conn.SetMaxIdleConns(25)
+	conn.SetMaxOpenConns(50)
+	conn.SetMaxIdleConns(50)
 	conn.SetConnMaxLifetime(5 * time.Minute)
 	h.dbConn = conn
 	return conn
 }
 
 // BeginTrx is helper to begin the database transaction
-func (h *Helpers) BeginTrx(ctx context.Context, opts *sql.TxOptions) error {
+func (h *Helpers) BeginTrx(ctx context.Context, opts *sql.TxOptions) (*sql.Tx, error) {
 	trx, err := h.dbConn.BeginTx(ctx, opts)
-	if err == nil {
-		h.dbTrx = trx
-	}
-	return err
-}
-
-// CommitTrx is helper to commit the database transaction
-func (h *Helpers) CommitTrx() error {
-	err := h.dbTrx.Commit()
-	h.dbTrx = nil
-	return err
-}
-
-// RollbackTrx is helper to rollback the database transaction
-func (h *Helpers) RollbackTrx() error {
-	err := h.dbTrx.Rollback()
-	h.dbTrx = nil
-	return err
-}
-
-// QueryContext is helper to execute query using context and transaction (if exists). return multiple rows.
-func (h *Helpers) QueryContext(ctx context.Context, query string) (rows *sql.Rows, err error) {
-	if h.dbTrx != nil {
-		rows, err = h.dbTrx.QueryContext(ctx, query)
-	} else {
-		rows, err = h.dbConn.QueryContext(ctx, query)
-	}
-	return
-}
-
-// QueryRowContext is helper to execute query using context and transaction (if exists). return single row.
-func (h *Helpers) QueryRowContext(ctx context.Context, query string) (row *sql.Row) {
-	if h.dbTrx != nil {
-		row = h.dbTrx.QueryRowContext(ctx, query)
-	} else {
-		row = h.dbConn.QueryRowContext(ctx, query)
-	}
-	return
+	return trx, err
 }

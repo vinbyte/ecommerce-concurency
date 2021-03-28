@@ -44,7 +44,7 @@ func (ou *orderUsecase) Checkout(ctx context.Context, param domain.CheckoutParam
 
 	// start getting the cart data
 	//start the db trans
-	err := ou.helper.BeginTrx(ctx, nil)
+	dbTx, err := ou.helper.BeginTrx(ctx, nil)
 	if err != nil {
 		log.Error(err)
 		if os.Getenv("MODE") != "production" {
@@ -57,10 +57,10 @@ func (ou *orderUsecase) Checkout(ctx context.Context, param domain.CheckoutParam
 		response = errorResponse
 		return code, response
 	}
-	cartData, err := ou.orderRepo.GetCartData(ctx, param.CartID, true)
+	cartData, err := ou.orderRepo.GetCartData(ctx, dbTx, param.CartID, true)
 	if err != nil {
 		//rollback if any error
-		_ = ou.helper.RollbackTrx()
+		_ = dbTx.Rollback()
 		log.Error("GetCartData ", err)
 		errorResponse.Error.Code = 500
 		code = 500
@@ -80,10 +80,10 @@ func (ou *orderUsecase) Checkout(ctx context.Context, param domain.CheckoutParam
 	}
 	stockList := make(map[string]int)
 	for _, item := range cartData.Items {
-		product, err := ou.productRepo.GetProductByCode(ctx, item.ProductCode, true)
+		product, err := ou.productRepo.GetProductByCode(ctx, dbTx, item.ProductCode, true)
 		if err != nil {
 			//rollback if any error
-			_ = ou.helper.RollbackTrx()
+			_ = dbTx.Rollback()
 			log.Error("GetProductByCode ", err)
 			if os.Getenv("MODE") != "production" {
 				errorItem.Message = err.Error()
@@ -97,7 +97,7 @@ func (ou *orderUsecase) Checkout(ctx context.Context, param domain.CheckoutParam
 			return code, response
 		}
 		if product.Stock < item.Qty {
-			_ = ou.helper.RollbackTrx()
+			_ = dbTx.Rollback()
 			errorItem.Message = "stock of " + product.Name + " not enough for your order"
 			errorItem.Reason = "ErrStock"
 			errorResponse.Error.Errors = append(errorResponse.Error.Errors, errorItem)
@@ -109,9 +109,9 @@ func (ou *orderUsecase) Checkout(ctx context.Context, param domain.CheckoutParam
 		}
 		stockList[product.Code] = product.Stock
 	}
-	orderID, err := ou.orderRepo.CreateOrders(ctx, cartData.UserID)
+	orderID, err := ou.orderRepo.CreateOrders(ctx, dbTx, cartData.UserID)
 	if err != nil {
-		_ = ou.helper.RollbackTrx()
+		_ = dbTx.Rollback()
 		log.Error("CreateOrders ", err)
 		if os.Getenv("MODE") != "production" {
 			errorItem.Message = err.Error()
@@ -125,9 +125,9 @@ func (ou *orderUsecase) Checkout(ctx context.Context, param domain.CheckoutParam
 		return code, response
 	}
 	for _, item := range cartData.Items {
-		err := ou.orderRepo.InsertOrderItems(ctx, orderID, item.ProductCode, item.Qty)
+		err := ou.orderRepo.InsertOrderItems(ctx, dbTx, orderID, item.ProductCode, item.Qty)
 		if err != nil {
-			_ = ou.helper.RollbackTrx()
+			_ = dbTx.Rollback()
 			log.Error("InsertOrderItems ", err)
 			if os.Getenv("MODE") != "production" {
 				errorItem.Message = err.Error()
@@ -143,9 +143,9 @@ func (ou *orderUsecase) Checkout(ctx context.Context, param domain.CheckoutParam
 			//decrease stock
 			oldStock := stockList[item.ProductCode]
 			newStock := oldStock - item.Qty
-			err = ou.productRepo.UpdateStock(ctx, item.ProductCode, newStock)
+			err = ou.productRepo.UpdateStock(ctx, dbTx, item.ProductCode, newStock)
 			if err != nil {
-				_ = ou.helper.RollbackTrx()
+				_ = dbTx.Rollback()
 				log.Error("UpdateStock ", err)
 				if os.Getenv("MODE") != "production" {
 					errorItem.Message = err.Error()
@@ -160,9 +160,9 @@ func (ou *orderUsecase) Checkout(ctx context.Context, param domain.CheckoutParam
 			}
 		}
 	}
-	err = ou.orderRepo.DeleteCart(ctx, cartData.CartID)
+	err = ou.orderRepo.DeleteCart(ctx, dbTx, cartData.CartID)
 	if err != nil {
-		_ = ou.helper.RollbackTrx()
+		_ = dbTx.Rollback()
 		log.Error("DeleteCart ", err)
 		if os.Getenv("MODE") != "production" {
 			errorItem.Message = err.Error()
@@ -176,7 +176,7 @@ func (ou *orderUsecase) Checkout(ctx context.Context, param domain.CheckoutParam
 		return code, response
 	}
 
-	_ = ou.helper.CommitTrx()
+	_ = dbTx.Commit()
 	var responseData domain.CheckoutResponse
 	responseData.OrderID = orderID
 	successResponse.Data = responseData

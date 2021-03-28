@@ -1,6 +1,9 @@
 package domain
 
-import "context"
+import (
+	"context"
+	"database/sql"
+)
 
 // ProductUsecase is usecases for product entity
 type ProductUsecase interface {
@@ -11,8 +14,8 @@ type ProductUsecase interface {
 // ProductRepository is repositories for product entity
 type ProductRepository interface {
 	GetAllProducts(ctx context.Context, offset int, limit int) ([]Product, error)
-	GetProductByCode(ctx context.Context, productCode string, isRowLocking bool) (Product, error)
-	UpdateStock(ctx context.Context, productCode string, stock int) error
+	GetProductByCode(ctx context.Context, dbTx *sql.Tx, productCode string, isRowLocking bool) (Product, error)
+	UpdateStock(ctx context.Context, dbTx *sql.Tx, productCode string, stock int) error
 }
 
 // Product is product data

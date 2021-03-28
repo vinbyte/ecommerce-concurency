@@ -46,13 +46,13 @@ func main() {
 	//setup the layers
 	//product entity
 	pr := productPostgresRepository.NewPostgresRepository(db, help)
-	pu := productUsecase.NewProductUsecase(timeoutDuration, pr, help)
-	productHttpDelivery.NewProductHandler(router, pu)
 	//order entity
 	or := orderPostgresRepository.NewPostgresRepository(db, help)
 	ou := orderUsecase.NewOrderUsecase(timeoutDuration, or, pr, help)
 	orderHttpDelivery.NewOrderHandler(router, ou)
-
+	//product entity
+	pu := productUsecase.NewProductUsecase(timeoutDuration, pr, or, help)
+	productHttpDelivery.NewProductHandler(router, pu)
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "5050"
