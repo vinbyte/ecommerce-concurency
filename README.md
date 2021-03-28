@@ -40,11 +40,11 @@ The solution is adding the [Mutual Exclusion](https://yourbasic.org/golang/mutex
 
 ![race-condition-fix](./assets/images/race-condition-fix.png)
 
-## Row Locking Transaction
+### Row Locking Transaction
 
 Without further-ado, let's move into `./ecommerce/database-row-locking` folder. This is a simple version of backend system of Ecommerce.
 
-### How to run
+#### How to run
 
 Using docker :
 
@@ -58,7 +58,7 @@ Without docker :
 - Import the `setup.sql` file into your database.
 - Run `go run app/main.go`.
 
-### Concurrent test
+#### Concurrent test
 
 Ok we have our application running. So, how do we test using concurrent connection. Take a look inside folder `/ecommerce/testing`. You will find 1 file `main.go`. Just run it `go run main.go`. This will simulate 10 people trying to buy a product which have only 3 stocks.
 
@@ -66,7 +66,7 @@ Ok we have our application running. So, how do we test using concurrent connecti
 
 As you can see, only 3 users success doing checkout process.
 
-### Explanation
+#### Explanation
 
 So, in this app Im implement :
 - Clean architecture. [See](./ecommerce/database-row-locking/app/main.go)
