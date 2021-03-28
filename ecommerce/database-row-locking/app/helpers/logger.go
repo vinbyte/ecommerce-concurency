@@ -10,6 +10,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// InitLogger used for initiate the logger
 func (h *Helpers) InitLogger() {
 	logAppendMode := os.Getenv("LOG_APPEND_MODE")
 	if logAppendMode == "" {
@@ -37,6 +38,7 @@ func (h *Helpers) InitLogger() {
 	}
 }
 
+// CustomRequestLogger is custom log form for every incoming http request
 func (h *Helpers) CustomRequestLogger() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		startTime := time.Now()
@@ -47,7 +49,7 @@ func (h *Helpers) CustomRequestLogger() gin.HandlerFunc {
 			"path":    c.Request.URL.Path,
 			"proto":   c.Request.Proto,
 			"status":  c.Writer.Status(),
-			"latency": time.Now().Sub(startTime),
+			"latency": time.Since(startTime),
 			"ua":      c.Request.UserAgent(),
 		}).Info()
 	}

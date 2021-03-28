@@ -37,6 +37,7 @@ func (h *Helpers) InitPostgres() *sql.DB {
 	return conn
 }
 
+// BeginTrx is helper to begin the database transaction
 func (h *Helpers) BeginTrx(ctx context.Context, opts *sql.TxOptions) error {
 	trx, err := h.dbConn.BeginTx(ctx, opts)
 	if err == nil {
@@ -45,14 +46,21 @@ func (h *Helpers) BeginTrx(ctx context.Context, opts *sql.TxOptions) error {
 	return err
 }
 
+// CommitTrx is helper to commit the database transaction
 func (h *Helpers) CommitTrx() error {
-	return h.dbTrx.Commit()
+	err := h.dbTrx.Commit()
+	h.dbTrx = nil
+	return err
 }
 
+// RollbackTrx is helper to rollback the database transaction
 func (h *Helpers) RollbackTrx() error {
-	return h.dbTrx.Rollback()
+	err := h.dbTrx.Rollback()
+	h.dbTrx = nil
+	return err
 }
 
+// QueryContext is helper to execute query using context and transaction (if exists). return multiple rows.
 func (h *Helpers) QueryContext(ctx context.Context, query string) (rows *sql.Rows, err error) {
 	if h.dbTrx != nil {
 		rows, err = h.dbTrx.QueryContext(ctx, query)
@@ -62,6 +70,7 @@ func (h *Helpers) QueryContext(ctx context.Context, query string) (rows *sql.Row
 	return
 }
 
+// QueryRowContext is helper to execute query using context and transaction (if exists). return single row.
 func (h *Helpers) QueryRowContext(ctx context.Context, query string) (row *sql.Row) {
 	if h.dbTrx != nil {
 		row = h.dbTrx.QueryRowContext(ctx, query)

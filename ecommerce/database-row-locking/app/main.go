@@ -10,6 +10,9 @@ import (
 	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
 
+	orderHttpDelivery "ecommerce-app/orders/delivery/http"
+	orderPostgresRepository "ecommerce-app/orders/repository/postgres"
+	orderUsecase "ecommerce-app/orders/usecase"
 	productHttpDelivery "ecommerce-app/products/delivery/http"
 	productPostgresRepository "ecommerce-app/products/repository/postgres"
 	productUsecase "ecommerce-app/products/usecase"
@@ -40,9 +43,15 @@ func main() {
 	})
 	router.Use(gin.Recovery())
 
+	//setup the layers
+	//product entity
 	pr := productPostgresRepository.NewPostgresRepository(db, help)
 	pu := productUsecase.NewProductUsecase(timeoutDuration, pr, help)
 	productHttpDelivery.NewProductHandler(router, pu)
+	//order entity
+	or := orderPostgresRepository.NewPostgresRepository(db, help)
+	ou := orderUsecase.NewOrderUsecase(timeoutDuration, or, pr, help)
+	orderHttpDelivery.NewOrderHandler(router, ou)
 
 	port := os.Getenv("PORT")
 	if port == "" {

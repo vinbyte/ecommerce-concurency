@@ -5,11 +5,14 @@ import "context"
 // ProductUsecase is usecases for product entity
 type ProductUsecase interface {
 	GetAllProducts(ctx context.Context, param GetProductListParam) (code int, response interface{})
+	ResetStock(ctx context.Context) (code int, response interface{})
 }
 
 // ProductRepository is repositories for product entity
 type ProductRepository interface {
 	GetAllProducts(ctx context.Context, offset int, limit int) ([]Product, error)
+	GetProductByCode(ctx context.Context, productCode string, isRowLocking bool) (Product, error)
+	UpdateStock(ctx context.Context, productCode string, stock int) error
 }
 
 // Product is product data
