@@ -14,20 +14,43 @@ type OrderUsecase struct {
 	mock.Mock
 }
 
-// AddCart provides a mock function with given fields: ctx, param
-func (_m *OrderUsecase) AddCart(ctx context.Context, param domain.AddToCartParam) (int, interface{}) {
-	ret := _m.Called(ctx, param)
+// AddCart provides a mock function with given fields: ctx, param, isRowLocking
+func (_m *OrderUsecase) AddCart(ctx context.Context, param domain.AddToCartParam, isRowLocking bool) (int, interface{}) {
+	ret := _m.Called(ctx, param, isRowLocking)
 
 	var r0 int
-	if rf, ok := ret.Get(0).(func(context.Context, domain.AddToCartParam) int); ok {
-		r0 = rf(ctx, param)
+	if rf, ok := ret.Get(0).(func(context.Context, domain.AddToCartParam, bool) int); ok {
+		r0 = rf(ctx, param, isRowLocking)
 	} else {
 		r0 = ret.Get(0).(int)
 	}
 
 	var r1 interface{}
-	if rf, ok := ret.Get(1).(func(context.Context, domain.AddToCartParam) interface{}); ok {
-		r1 = rf(ctx, param)
+	if rf, ok := ret.Get(1).(func(context.Context, domain.AddToCartParam, bool) interface{}); ok {
+		r1 = rf(ctx, param, isRowLocking)
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(interface{})
+		}
+	}
+
+	return r0, r1
+}
+
+// Checkout provides a mock function with given fields: ctx, param, isRowLocking
+func (_m *OrderUsecase) Checkout(ctx context.Context, param domain.CheckoutParam, isRowLocking bool) (int, interface{}) {
+	ret := _m.Called(ctx, param, isRowLocking)
+
+	var r0 int
+	if rf, ok := ret.Get(0).(func(context.Context, domain.CheckoutParam, bool) int); ok {
+		r0 = rf(ctx, param, isRowLocking)
+	} else {
+		r0 = ret.Get(0).(int)
+	}
+
+	var r1 interface{}
+	if rf, ok := ret.Get(1).(func(context.Context, domain.CheckoutParam, bool) interface{}); ok {
+		r1 = rf(ctx, param, isRowLocking)
 	} else {
 		if ret.Get(1) != nil {
 			r1 = ret.Get(1).(interface{})

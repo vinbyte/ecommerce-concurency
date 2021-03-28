@@ -36,3 +36,26 @@ func (_m *ProductUsecase) GetAllProducts(ctx context.Context, param domain.GetPr
 
 	return r0, r1
 }
+
+// ResetStock provides a mock function with given fields: ctx
+func (_m *ProductUsecase) ResetStock(ctx context.Context) (int, interface{}) {
+	ret := _m.Called(ctx)
+
+	var r0 int
+	if rf, ok := ret.Get(0).(func(context.Context) int); ok {
+		r0 = rf(ctx)
+	} else {
+		r0 = ret.Get(0).(int)
+	}
+
+	var r1 interface{}
+	if rf, ok := ret.Get(1).(func(context.Context) interface{}); ok {
+		r1 = rf(ctx)
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(interface{})
+		}
+	}
+
+	return r0, r1
+}
