@@ -66,6 +66,10 @@ Ok we have our application running. So, how do we test using concurrent connecti
 
 As you can see, only 3 users success doing checkout process.
 
+#### Unit test
+
+Im sorry due to time limit, I cannot write the unit test, but if you want to know how Im write the unit test for the same architecture like this, see [this repo](https://github.com/vinbyte/movies).
+
 #### Explanation
 
 So, in this app Im implement :
@@ -91,3 +95,83 @@ The endpoints :
 | `/v1/reset` | GET | endpoint helper to reset the stock and clear cart and order |
 
 API Docs : <https://vin.gg/ecommerceapidocs>
+
+## Bonus : A Treasure Hunt
+
+### Overview
+
+- Given the following layout
+
+```
+########
+#......#
+#.###..#
+#...#.##
+#X#....#
+########
+```
+- `#` represents an obstacle. `.` represents a clear path. `X` represents the player’s starting position.
+- A treasure is hidden within one of the clear path points, and the user must find it.
+- From the starting position, **the user must navigate in a specific order:
+Up/North A step(s), then
+Right/East B step(s), then
+Down/South C step(s)**.
+- The possible treasure marked with `$` sign.
+
+Output a list of probable coordinate points where the treasure might be located.
+
+### Run the code
+
+- Enter to the folder at `/treasure-hunt`.
+- Run `go run main.go`
+- After that, you will find the final answer is :
+
+Location 1
+```
+######## 
+#......#
+#.###..#
+#...#.##
+#X#$...#
+########
+```
+
+Location 2
+```
+########
+#......#
+#.###$.#
+#...#.##
+#X#....#
+########
+```
+
+Location 3
+```
+########
+#......#
+#.###..#
+#...#$##
+#X#....#
+########
+```
+
+Location 4
+```
+########
+#......#
+#.###..#
+#...#.##
+#X#..$.#
+########
+```
+
+Location 5
+```
+########
+#......#
+#.###.$#
+#...#.##
+#X#....#
+########
+```
